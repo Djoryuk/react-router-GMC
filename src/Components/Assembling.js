@@ -2,10 +2,14 @@ import React, { useState, useEffect } from "react";
 // Assets
 import noimage from "../Assets/noimage.jpg";
 // Components
-import MovieSearch from "./movieSearch";
+
 import MovieCard from "./movieCard";
+import Filter from "./movieSearch"
 // Datas
-import MovieLists from './movieLists';
+import {MovieLists} from './movieLists';
+//route 
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
+import Description from "./Description"
 
 
 export default function Assembling() {
@@ -16,6 +20,7 @@ export default function Assembling() {
         title: "",
         rate: "",
         desc: "",
+        film: "",
     });
     const [movies, setMovies] = useState([...MovieLists]);
 
@@ -36,19 +41,49 @@ export default function Assembling() {
     useEffect(() => {
         console.log(movies);
     }, [movies]);
+    const location = useLocation();
+
     return (
     <>
-        <MovieSearch
-            titleFilter={titleFilter}
-            handleTitleSearch={handleTitleSearch}
-            addMovie={addMovie}
-            setAddMovie={setAddMovie}
-            handleSubmit={handleSubmit}
-        />
-        <MovieCard
-            MovieList={MovieLists}
-            dataSearch={dataSearch}
-            movies={movies}
-        />
+        
+        <Routes>
+            <Route path="main" element={
+                <Main 
+                    titleFilter={titleFilter} 
+                    handleTitleSearch={handleTitleSearch} 
+                    addMovie={addMovie}
+                    setAddMovie={setAddMovie}
+                    handleSubmit={handleSubmit}
+                />} 
+            >
+                <Route path="home" exact element={
+                <MovieCard movies={movies} dataSearch={dataSearch}/>} 
+                />
+                <Route path="home/:id" element={<Description movies={movies} movieId={location.state}/>} />
+            </Route>
+            <Route
+                path="*"
+                element={<Navigate to="main/home" />}
+            />
+        </Routes>
     </>
+    
 );}
+
+function Main({titleFilter, handleTitleSearch, addMovie, setAddMovie, handleSubmit}) {
+
+    return (
+        <>
+            <div>
+                <Filter 
+                    titleFilter={titleFilter} 
+                    handleTitleSearch={handleTitleSearch} 
+                    addMovie={addMovie}
+                    setAddMovie={setAddMovie}
+                    handleSubmit={handleSubmit}
+                />
+                <Outlet/>
+            </div>
+        </>
+    )
+    }
